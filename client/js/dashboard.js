@@ -1,4 +1,11 @@
-const API_URL = 'https://football-mf27.onrender.com/api';
+const isLocal = window.location.hostname === 'localhost' ||
+    window.location.hostname === '127.0.0.1' ||
+    window.location.hostname === '' ||
+    window.location.protocol === 'file:';
+const API_BASE = isLocal ? 'http://localhost:5000' : 'https://football-mf27.onrender.com';
+const API_URL = `${API_BASE}/api`;
+
+console.log('🚀 FCMS Dashboard Started. API Path:', API_URL);
 let token = localStorage.getItem('token');
 let user = JSON.parse(localStorage.getItem('user'));
 
@@ -52,11 +59,36 @@ document.addEventListener('DOMContentLoaded', () => {
     setupModals();
 });
 
-function getHeaders() {
-    return {
-        'Content-Type': 'application/json',
+// Global Fetch Wrapper for consistent error handling and performance
+async function apiFetch(endpoint, options = {}) {
+    const defaultHeaders = {
         'Authorization': `Bearer ${token}`
     };
+
+    if (!(options.body instanceof FormData)) {
+        defaultHeaders['Content-Type'] = 'application/json';
+    }
+
+    try {
+        const response = await fetch(`${API_URL}${endpoint}`, {
+            ...options,
+            headers: {
+                ...defaultHeaders,
+                ...options.headers
+            }
+        });
+
+        if (response.status === 401) {
+            localStorage.removeItem('token');
+            localStorage.removeItem('user');
+            window.location.href = 'index.html';
+        }
+
+        return response;
+    } catch (error) {
+        console.error('Fetch error:', error);
+        throw error;
+    }
 }
 
 function showLoading(tbodyId, colSpan = 5) {
@@ -80,9 +112,9 @@ function loadDataForView(viewId) {
 async function loadDashboardData() {
     try {
         const [pRes, tRes, fRes] = await Promise.all([
-            fetch(`${API_URL}/players`, { headers: getHeaders() }),
-            fetch(`${API_URL}/tournaments`, { headers: getHeaders() }),
-            fetch(`${API_URL}/fixtures`, { headers: getHeaders() })
+            apiFetch('/players'),
+            apiFetch('/tournaments'),
+            apiFetch('/fixtures')
         ]);
         const players = await pRes.json();
         const tournaments = await tRes.json();
@@ -102,7 +134,7 @@ async function loadDashboardData() {
 async function fetchPlayers() {
     showLoading('playersTableBody', 5);
     try {
-        const res = await fetch(`${API_URL}/players`, { headers: getHeaders() });
+        const res = await apiFetch('/players');
         const players = await res.json();
         const tbody = document.getElementById('playersTableBody');
         if (!Array.isArray(players) || players.length === 0) {
@@ -113,7 +145,8 @@ async function fetchPlayers() {
             const tr = document.createElement('tr');
             tr.innerHTML = `
                 <td class="player-cell">
-                    <img src="${p.image ? (p.image.startsWith('uploads/') ? 'https://football-mf27.onrender.com/' + p.image : p.image) : 'https://via.placeholder.com/40'}" class="player-thumb" alt="${p.name}">
+                    <img src="${p.image ? (p.image.startsWith('uploads/') ? API_BASE + '/' + p.image : p.image) : 'https://via.placeholder.com/40'}" 
+                         class="player-thumb" alt="${p.name}" loading="lazy">
                     <div>
                         <div class="player-name-main">${p.name}</div>
                         <small style="color:#8b949e">#${p.number || '--'}</small>
@@ -139,7 +172,7 @@ async function fetchPlayers() {
 async function fetchTournaments() {
     showLoading('tournamentsTableBody', 5);
     try {
-        const res = await fetch(`${API_URL}/tournaments`, { headers: getHeaders() });
+        const res = await apiFetch('/tournaments');
         const tournaments = await res.json();
         const tbody = document.getElementById('tournamentsTableBody');
         if (!Array.isArray(tournaments) || tournaments.length === 0) {
@@ -167,7 +200,7 @@ async function fetchTournaments() {
 async function fetchFixtures() {
     showLoading('fixturesTableBody', 6);
     try {
-        const res = await fetch(`${API_URL}/fixtures`, { headers: getHeaders() });
+        const res = await apiFetch('/fixtures');
         const fixtures = await res.json();
         const tbody = document.getElementById('fixturesTableBody');
         if (!Array.isArray(fixtures) || fixtures.length === 0) {
@@ -196,7 +229,7 @@ async function fetchFixtures() {
 async function fetchGrounds() {
     showLoading('groundsTableBody', 4);
     try {
-        const res = await fetch(`${API_URL}/grounds`, { headers: getHeaders() });
+        const res = await apiFetch('/grounds');
         const grounds = await res.json();
         const tbody = document.getElementById('groundsTableBody');
         if (!Array.isArray(grounds) || grounds.length === 0) {
@@ -221,9 +254,8 @@ async function fetchGrounds() {
 async function deletePlayer(id) {
     if (confirm('Are you sure you want to delete this player?')) {
         try {
-            const res = await fetch(`${API_URL}/players/${id}`, {
-                method: 'DELETE',
-                headers: getHeaders()
+            const res = await apiFetch(`/players/${id}`, {
+                method: 'DELETE'
             });
             if (res.ok) {
                 fetchPlayers();
@@ -317,9 +349,8 @@ function setupModals() {
             }
 
             try {
-                const res = await fetch(`${API_URL}/players/${id}`, {
+                const res = await apiFetch(`/players/${id}`, {
                     method: 'PUT',
-                    headers: { 'Authorization': `Bearer ${token}` },
                     body: formData
                 });
                 if (res.ok) {
@@ -398,10 +429,10 @@ async function submitForm(endpoint, body) {
     if (!isFormData) headers['Content-Type'] = 'application/json';
 
     try {
-        const res = await fetch(`${API_URL}${endpoint}`, {
+        const res = await apiFetch(endpoint, {
             method: 'POST',
-            headers: headers,
-            body: isFormData ? body : JSON.stringify(body)
+            body: isFormData ? body : JSON.stringify(body),
+            headers: isFormData ? {} : { 'Content-Type': 'application/json' }
         });
         if (res.ok) return true;
         const err = await res.json();
@@ -417,7 +448,7 @@ async function populateTournamentSelect() {
     const select = document.getElementById('fixtureTournamentSelect');
     select.innerHTML = '<option value="" disabled selected>Loading...</option>';
     try {
-        const res = await fetch(`${API_URL}/tournaments`, { headers: getHeaders() });
+        const res = await apiFetch('/tournaments');
         const data = await res.json();
         select.innerHTML = '<option value="" disabled selected>Select a Tournament</option>';
         data.forEach(t => {
@@ -435,9 +466,7 @@ function viewPlayerProfile(id) {
 
 async function openEditPlayerModal(id) {
     try {
-        const res = await fetch(`${API_URL}/players/${id}`, {
-            headers: { 'Authorization': `Bearer ${token}` }
-        });
+        const res = await apiFetch(`/players/${id}`);
         const p = await res.json();
         if (res.ok) {
             document.getElementById('editPlayerId').value = p._id;

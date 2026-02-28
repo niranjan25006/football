@@ -5,10 +5,16 @@ const path = require('path');
 const { getPlayers, getPlayerById, addPlayer, updatePlayer, deletePlayer } = require('../controllers/playerController');
 const { protect, adminOnly } = require('../middleware/authMiddleware');
 
+const fs = require('fs');
+
 // Multer Config
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
-        cb(null, 'uploads/players');
+        const dir = 'uploads/players';
+        if (!fs.existsSync(dir)) {
+            fs.mkdirSync(dir, { recursive: true });
+        }
+        cb(null, dir);
     },
     filename: (req, file, cb) => {
         cb(null, `${Date.now()}-${file.originalname}`);

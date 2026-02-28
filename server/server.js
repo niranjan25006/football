@@ -1,6 +1,8 @@
 const express = require('express');
 const dotenv = require('dotenv');
 const cors = require('cors');
+const compression = require('compression');
+const morgan = require('morgan');
 const connectDB = require('./config/db');
 
 // Load env vars
@@ -12,6 +14,8 @@ connectDB();
 const app = express();
 
 // Middleware
+app.use(compression());
+app.use(morgan('dev'));
 app.use(cors({
     origin: '*',
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
@@ -26,6 +30,8 @@ app.use('/api/players', require('./routes/playerRoutes'));
 app.use('/api/tournaments', require('./routes/tournamentRoutes'));
 app.use('/api/fixtures', require('./routes/fixtureRoutes'));
 app.use('/api/grounds', require('./routes/groundRoutes'));
+app.use('/api/teams', require('./routes/teamRoutes'));
+
 
 app.get('/', (req, res) => res.send('Football Club Management API Running'));
 

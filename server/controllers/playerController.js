@@ -24,10 +24,11 @@ const getPlayerById = async (req, res) => {
 
 const addPlayer = async (req, res) => {
     const { name, age, position, number, height, preferredFoot, nationality, teamId } = req.body;
-    let image = req.body.image;
-
+    let image = '';
     if (req.file) {
         image = `uploads/players/${req.file.filename}`;
+    } else if (req.body.image) {
+        image = req.body.image;
     }
 
     try {
@@ -35,6 +36,7 @@ const addPlayer = async (req, res) => {
         const createdPlayer = await player.save();
         res.status(201).json(createdPlayer);
     } catch (error) {
+        console.error('Add Player Error:', error);
         res.status(500).json({ message: error.message });
     }
 };
@@ -57,7 +59,7 @@ const updatePlayer = async (req, res) => {
 
             if (req.file) {
                 player.image = `uploads/players/${req.file.filename}`;
-            } else if (req.body.image) {
+            } else if (req.body.image !== undefined) {
                 player.image = req.body.image;
             }
 
@@ -67,6 +69,7 @@ const updatePlayer = async (req, res) => {
             res.status(404).json({ message: 'Player not found' });
         }
     } catch (error) {
+        console.error('Update Player Error:', error);
         res.status(500).json({ message: error.message });
     }
 };

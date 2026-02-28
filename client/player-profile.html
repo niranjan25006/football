@@ -394,8 +394,73 @@
         </div>
     </div>
 
+    <!-- Footer Section -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-section">
+                <h4><i class="fas fa-futbol"></i> FCMS</h4>
+                <p>The world's most advanced football club management system.</p>
+                <div class="social-links">
+                    <a href="#"><i class="fab fa-facebook"></i></a>
+                    <a href="#"><i class="fab fa-twitter"></i></a>
+                    <a href="#"><i class="fab fa-instagram"></i></a>
+                </div>
+            </div>
+            <div class="footer-section">
+                <h4>Support</h4>
+                <ul class="footer-links">
+                    <li><a href="dashboard.html">Dashboard</a></li>
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="#">Privacy Policy</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            &copy; 2026 Football Club Management System.
+        </div>
+    </footer>
+
     <script>
-        const API_URL = 'https://football-mf27.onrender.com/api';
+        const isLocal = window.location.hostname === 'localhost' ||
+            window.location.hostname === '127.0.0.1' ||
+            window.location.hostname === '' ||
+            window.location.protocol === 'file:';
+        const API_BASE = isLocal ? 'http://localhost:5000' : 'https://football-mf27.onrender.com';
+        const API_URL = `${API_BASE}/api`;
+
+        console.log('🚀 Player Profile Started. API Path:', API_URL);
+
+        // Global Fetch Wrapper for consistent error handling and performance
+        async function apiFetch(endpoint, options = {}) {
+            const defaultHeaders = {
+                'Authorization': localStorage.getItem('token') ? `Bearer ${localStorage.getItem('token')}` : ''
+            };
+
+            if (!(options.body instanceof FormData)) {
+                defaultHeaders['Content-Type'] = 'application/json';
+            }
+
+            try {
+                const response = await fetch(`${API_URL}${endpoint}`, {
+                    ...options,
+                    headers: {
+                        ...defaultHeaders,
+                        ...options.headers
+                    }
+                });
+
+                if (response.status === 401) {
+                    localStorage.removeItem('token');
+                    localStorage.removeItem('user');
+                    window.location.href = 'index.html';
+                }
+
+                return response;
+            } catch (error) {
+                console.error('Fetch error:', error);
+                throw error;
+            }
+        }
         const urlParams = new URLSearchParams(window.location.search);
         const playerId = urlParams.get('id');
         const token = localStorage.getItem('token');
@@ -435,12 +500,8 @@
             };
 
             try {
-                const res = await fetch(`${API_URL}/players/${playerId}`, {
+                const res = await apiFetch(`/players/${playerId}`, {
                     method: 'PUT',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${token}`
-                    },
                     body: JSON.stringify(payload)
                 });
 
@@ -481,7 +542,7 @@
 
                 // For direct file uploads, we need to ensure they are point to the server
                 const finalSrc = player.image.startsWith('uploads/')
-                    ? `https://football-mf27.onrender.com/${player.image}`
+                    ? `${API_BASE}/${player.image}`
                     : player.image;
 
                 document.getElementById('playerImage').src = finalSrc;
@@ -493,9 +554,7 @@
 
         document.addEventListener('DOMContentLoaded', async () => {
             try {
-                const res = await fetch(`${API_URL}/players/${playerId}`, {
-                    headers: { 'Authorization': `Bearer ${token}` }
-                });
+                const res = await apiFetch(`/players/${playerId}`);
                 const player = await res.json();
 
                 if (res.ok) {

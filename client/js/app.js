@@ -1,6 +1,51 @@
-const API_URL = 'https://football-mf27.onrender.com/api';
+const isLocal = window.location.hostname === 'localhost' ||
+    window.location.hostname === '127.0.0.1' ||
+    window.location.hostname === '' ||
+    window.location.protocol === 'file:';
+const API_BASE = isLocal ? 'http://localhost:5000' : 'https://football-mf27.onrender.com';
+const API_URL = `${API_BASE}/api`;
+
+console.log('🚀 FCMS Client Started. API Path:', API_URL);
+
+// Global Fetch Wrapper for consistent error handling and performance
+async function apiFetch(endpoint, options = {}) {
+    const defaultHeaders = {
+        'Authorization': localStorage.getItem('token') ? `Bearer ${localStorage.getItem('token')}` : ''
+    };
+
+    if (!(options.body instanceof FormData)) {
+        defaultHeaders['Content-Type'] = 'application/json';
+    }
+
+    try {
+        const response = await fetch(`${API_URL}${endpoint}`, {
+            ...options,
+            headers: {
+                ...defaultHeaders,
+                ...options.headers
+            }
+        });
+
+        if (response.status === 401) {
+            // Handle expired token
+            localStorage.removeItem('token');
+            localStorage.removeItem('user');
+            if (!window.location.pathname.endsWith('index.html')) {
+                window.location.href = 'index.html';
+            }
+        }
+
+        return response;
+    } catch (error) {
+        console.error('Fetch error:', error);
+        throw error;
+    }
+}
 
 document.addEventListener('DOMContentLoaded', () => {
+    // Pre-warm the server immediately on load
+    fetch(API_BASE).catch(() => { });
+
     const modal = document.getElementById('authModal');
     const loginBtn = document.getElementById('loginBtn');
     const closeBtn = document.getElementById('closeModal');
@@ -16,9 +61,6 @@ document.addEventListener('DOMContentLoaded', () => {
     loginBtn.addEventListener('click', (e) => {
         e.preventDefault();
         modal.classList.add('show');
-
-        // Pre-warm the server to mitigate Render cold starts
-        fetch(API_URL.replace('/api', '')).catch(() => { });
     });
 
     closeBtn.addEventListener('click', () => {
@@ -67,9 +109,8 @@ document.addEventListener('DOMContentLoaded', () => {
         loginError.innerText = '';
 
         try {
-            const res = await fetch(`${API_URL}${endpoint}`, {
+            const res = await apiFetch(endpoint, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ email, password })
             });
             const data = await res.json();
@@ -84,10 +125,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 submitBtn.innerText = originalBtnText;
             }
         } catch (err) {
-            loginError.innerText = 'Server error. Try again later.';
+            loginError.innerText = 'Network error. Please check your connection.';
             submitBtn.disabled = false;
             submitBtn.innerText = originalBtnText;
-            console.error(err);
         }
     });
 
@@ -109,9 +149,8 @@ document.addEventListener('DOMContentLoaded', () => {
         regError.innerText = '';
 
         try {
-            const res = await fetch(`${API_URL}${endpoint}`, {
+            const res = await apiFetch(endpoint, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ username, email, password })
             });
             const data = await res.json();
@@ -126,10 +165,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 submitBtn.innerText = originalBtnText;
             }
         } catch (err) {
-            regError.innerText = 'Server error. Try again later.';
+            regError.innerText = 'Network error. Please check your connection.';
             submitBtn.disabled = false;
             submitBtn.innerText = originalBtnText;
-            console.error(err);
         }
     });
 });
