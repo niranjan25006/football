@@ -53,8 +53,15 @@ document.addEventListener('DOMContentLoaded', () => {
         const email = document.getElementById('loginEmail').value;
         const password = document.getElementById('loginPassword').value;
         const isAdmin = document.getElementById('loginIsAdmin').checked;
+        const submitBtn = loginForm.querySelector('button[type="submit"]');
+        const originalBtnText = submitBtn.innerText;
 
         const endpoint = isAdmin ? '/auth/admin/login' : '/auth/login';
+
+        // Show loading state
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Authenticating...';
+        loginError.innerText = '';
 
         try {
             const res = await fetch(`${API_URL}${endpoint}`, {
@@ -70,9 +77,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 window.location.href = 'dashboard.html';
             } else {
                 loginError.innerText = data.message || 'Login failed';
+                submitBtn.disabled = false;
+                submitBtn.innerText = originalBtnText;
             }
         } catch (err) {
             loginError.innerText = 'Server error. Try again later.';
+            submitBtn.disabled = false;
+            submitBtn.innerText = originalBtnText;
             console.error(err);
         }
     });
@@ -84,8 +95,15 @@ document.addEventListener('DOMContentLoaded', () => {
         const email = document.getElementById('regEmail').value;
         const password = document.getElementById('regPassword').value;
         const isAdmin = document.getElementById('regIsAdmin').checked;
+        const submitBtn = registerForm.querySelector('button[type="submit"]');
+        const originalBtnText = submitBtn.innerText;
 
         const endpoint = isAdmin ? '/auth/admin/register' : '/auth/register';
+
+        // Show loading state
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating Account...';
+        regError.innerText = '';
 
         try {
             const res = await fetch(`${API_URL}${endpoint}`, {
@@ -101,9 +119,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 window.location.href = 'dashboard.html';
             } else {
                 regError.innerText = data.message || 'Registration failed';
+                submitBtn.disabled = false;
+                submitBtn.innerText = originalBtnText;
             }
         } catch (err) {
             regError.innerText = 'Server error. Try again later.';
+            submitBtn.disabled = false;
+            submitBtn.innerText = originalBtnText;
             console.error(err);
         }
     });

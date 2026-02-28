@@ -1,7 +1,7 @@
 const User = require('../models/User');
 const Admin = require('../models/Admin');
 const jwt = require('jsonwebtoken');
-const bcrypt = require('bcryptjs');
+const bcrypt = require('bcrypt');
 
 const generateToken = (id, role) => {
     return jwt.sign({ id, role }, process.env.JWT_SECRET || 'secret123', {
