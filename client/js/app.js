@@ -16,6 +16,9 @@ document.addEventListener('DOMContentLoaded', () => {
     loginBtn.addEventListener('click', (e) => {
         e.preventDefault();
         modal.classList.add('show');
+
+        // Pre-warm the server to mitigate Render cold starts
+        fetch(API_URL.replace('/api', '')).catch(() => { });
     });
 
     closeBtn.addEventListener('click', () => {

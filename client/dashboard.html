@@ -128,6 +128,8 @@
         <section id="fixtures-view" class="view hidden">
             <div class="view-header">
                 <h3>Fixtures</h3>
+                <button class="btn-primary admin-only" id="generateFixturesBtn"><i class="fas fa-plus"></i> Generate
+                    Fixtures</button>
             </div>
             <table class="data-table">
                 <thead>
@@ -174,7 +176,7 @@
     <div id="addPlayerModal" class="modal">
         <div class="modal-content">
             <span class="close-btn" id="closePlayerModal">&times;</span>
-            <h3>Add New Player</h3>
+            <h3 class="modal-title">Add New Player</h3>
             <form id="addPlayerForm" class="dashboard-form">
                 <input type="text" id="playerName" placeholder="Player Name" required>
                 <input type="number" id="playerAge" placeholder="Age" required>
@@ -186,6 +188,62 @@
                     <option value="Goalkeeper">Goalkeeper</option>
                 </select>
                 <button type="submit" class="btn-primary">Save Player</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Add Tournament Modal -->
+    <div id="addTournamentModal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" id="closeTournamentModal">&times;</span>
+            <h3 class="modal-title">Create New Tournament</h3>
+            <form id="addTournamentForm" class="dashboard-form">
+                <input type="text" id="tourName" placeholder="Tournament Name" required>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Start Date</label>
+                        <input type="date" id="tourStartDate" required>
+                    </div>
+                    <div class="form-group">
+                        <label>End Date</label>
+                        <input type="date" id="tourEndDate" required>
+                    </div>
+                </div>
+                <input type="number" id="tourEntryFee" placeholder="Entry Fee (₹)" required>
+                <input type="number" id="tourPrizeMoney" placeholder="Prize Money (₹)" required>
+                <button type="submit" class="btn-primary">Create Tournament</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Generate Fixtures Modal -->
+    <div id="addFixtureModal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" id="closeFixtureModal">&times;</span>
+            <h3 class="modal-title">Generate Fixtures</h3>
+            <form id="generateFixturesForm" class="dashboard-form">
+                <label>Select Tournament</label>
+                <select id="fixtureTournamentSelect" required>
+                    <option value="" disabled selected>Loading tournaments...</option>
+                </select>
+                <p class="form-note">Fixtures will be generated for all teams currently registered in this tournament.
+                </p>
+                <button type="submit" class="btn-primary">Generate Now</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Add Ground Modal -->
+    <div id="addGroundModal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" id="closeGroundModal">&times;</span>
+            <h3 class="modal-title">Add New Ground</h3>
+            <form id="addGroundForm" class="dashboard-form">
+                <input type="text" id="groundName" placeholder="Ground Name" required>
+                <input type="text" id="groundLocation" placeholder="Location" required>
+                <input type="number" id="groundCapacity" placeholder="Capacity" required>
+                <input type="number" id="groundRent" placeholder="Rent per Match (₹)" required>
+                <button type="submit" class="btn-primary">Save Ground</button>
             </form>
         </div>
     </div>

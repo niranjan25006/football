@@ -156,13 +156,13 @@ async function fetchTournaments() {
 }
 
 async function fetchFixtures() {
-    showLoading('fixturesTableBody', 5);
+    showLoading('fixturesTableBody', 6);
     try {
         const res = await fetch(`${API_URL}/fixtures`, { headers: getHeaders() });
         const fixtures = await res.json();
         const tbody = document.getElementById('fixturesTableBody');
         if (!Array.isArray(fixtures) || fixtures.length === 0) {
-            return showEmpty('fixturesTableBody', 'No fixtures yet. Generate fixtures from a tournament.', 5);
+            return showEmpty('fixturesTableBody', 'No fixtures yet. Generate fixtures from a tournament.', 6);
         }
         tbody.innerHTML = '';
         fixtures.forEach(f => {
@@ -174,11 +174,12 @@ async function fetchFixtures() {
                 <td>${f.homeTeam?.name || 'TBD'}</td>
                 <td>${f.awayTeam?.name || 'TBD'}</td>
                 <td>${date}</td>
+                <td>${f.groundId?.name || 'TBD'}</td>
                 <td style="color:${statusColor};text-transform:capitalize;">${f.status}</td>`;
             tbody.appendChild(tr);
         });
     } catch (err) {
-        showEmpty('fixturesTableBody', 'Could not load fixtures. Try again in 30s.', 5);
+        showEmpty('fixturesTableBody', 'Could not load fixtures. Try again in 30s.', 6);
         console.error(err);
     }
 }
@@ -224,38 +225,126 @@ async function deletePlayer(id) {
 }
 
 function setupModals() {
-    const playerModal = document.getElementById('addPlayerModal');
-    const closePlayerModal = document.getElementById('closePlayerModal');
-    const addPlayerBtn = document.getElementById('addPlayerBtn');
-    const addPlayerForm = document.getElementById('addPlayerForm');
+    const modals = {
+        player: { el: document.getElementById('addPlayerModal'), open: document.getElementById('addPlayerBtn'), close: document.getElementById('closePlayerModal'), form: document.getElementById('addPlayerForm') },
+        tour: { el: document.getElementById('addTournamentModal'), open: document.getElementById('addTournamentBtn'), close: document.getElementById('closeTournamentModal'), form: document.getElementById('addTournamentForm') },
+        fixture: { el: document.getElementById('addFixtureModal'), open: document.getElementById('generateFixturesBtn'), close: document.getElementById('closeFixtureModal'), form: document.getElementById('generateFixturesForm') },
+        ground: { el: document.getElementById('addGroundModal'), open: document.getElementById('addGroundBtn'), close: document.getElementById('closeGroundModal'), form: document.getElementById('addGroundForm') }
+    };
 
-    if (addPlayerBtn) addPlayerBtn.addEventListener('click', () => playerModal.classList.add('show'));
-    if (closePlayerModal) closePlayerModal.addEventListener('click', () => playerModal.classList.remove('show'));
+    // Generic open/close logic
+    Object.values(modals).forEach(m => {
+        if (m.open) m.open.addEventListener('click', () => {
+            m.el.classList.add('show');
+            if (m === modals.fixture) populateTournamentSelect();
+        });
+        if (m.close) m.close.addEventListener('click', () => m.el.classList.remove('show'));
+    });
 
-    if (addPlayerForm) {
-        addPlayerForm.addEventListener('submit', async (e) => {
+    // Specific Form Handlers
+    // Players
+    if (modals.player.form) {
+        modals.player.form.addEventListener('submit', async (e) => {
             e.preventDefault();
-            const name = document.getElementById('playerName').value;
-            const age = document.getElementById('playerAge').value;
-            const position = document.getElementById('playerPosition').value;
-            try {
-                const res = await fetch(`${API_URL}/players`, {
-                    method: 'POST',
-                    headers: getHeaders(),
-                    body: JSON.stringify({ name, age, position })
-                });
-                if (res.ok) {
-                    playerModal.classList.remove('show');
-                    addPlayerForm.reset();
-                    fetchPlayers();
-                    loadDashboardData();
-                } else {
-                    alert('Failed to add player');
-                }
-            } catch (err) { console.error(err); }
+            const payload = {
+                name: document.getElementById('playerName').value,
+                age: document.getElementById('playerAge').value,
+                position: document.getElementById('playerPosition').value
+            };
+            if (await submitForm('/players', payload)) {
+                modals.player.el.classList.remove('show');
+                modals.player.form.reset();
+                fetchPlayers();
+                loadDashboardData();
+            }
         });
     }
+
+    // Tournaments
+    if (modals.tour.form) {
+        modals.tour.form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const payload = {
+                name: document.getElementById('tourName').value,
+                startDate: document.getElementById('tourStartDate').value,
+                endDate: document.getElementById('tourEndDate').value,
+                entryFee: document.getElementById('tourEntryFee').value,
+                prizeMoney: document.getElementById('tourPrizeMoney').value
+            };
+            if (await submitForm('/tournaments', payload)) {
+                modals.tour.el.classList.remove('show');
+                modals.tour.form.reset();
+                fetchTournaments();
+                loadDashboardData();
+            }
+        });
+    }
+
+    // Fixtures
+    if (modals.fixture.form) {
+        modals.fixture.form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const payload = { tournamentId: document.getElementById('fixtureTournamentSelect').value };
+            if (await submitForm('/fixtures/generate', payload)) {
+                modals.fixture.el.classList.remove('show');
+                fetchFixtures();
+                loadDashboardData();
+            }
+        });
+    }
+
+    // Grounds
+    if (modals.ground.form) {
+        modals.ground.form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const payload = {
+                name: document.getElementById('groundName').value,
+                location: document.getElementById('groundLocation').value,
+                capacity: document.getElementById('groundCapacity').value,
+                rentPerMatch: document.getElementById('groundRent').value
+            };
+            if (await submitForm('/grounds', payload)) {
+                modals.ground.el.classList.remove('show');
+                modals.ground.form.reset();
+                fetchGrounds();
+            }
+        });
+    }
+
     window.addEventListener('click', (e) => {
-        if (e.target === playerModal) playerModal.classList.remove('show');
+        Object.values(modals).forEach(m => { if (e.target === m.el) m.el.classList.remove('show'); });
     });
+}
+
+async function submitForm(endpoint, body) {
+    try {
+        const res = await fetch(`${API_URL}${endpoint}`, {
+            method: 'POST',
+            headers: getHeaders(),
+            body: JSON.stringify(body)
+        });
+        if (res.ok) return true;
+        const err = await res.json();
+        alert(err.message || 'Action failed');
+    } catch (err) {
+        console.error(err);
+        alert('Server unreachable');
+    }
+    return false;
+}
+
+async function populateTournamentSelect() {
+    const select = document.getElementById('fixtureTournamentSelect');
+    select.innerHTML = '<option value="" disabled selected>Loading...</option>';
+    try {
+        const res = await fetch(`${API_URL}/tournaments`, { headers: getHeaders() });
+        const data = await res.json();
+        select.innerHTML = '<option value="" disabled selected>Select a Tournament</option>';
+        data.forEach(t => {
+            const option = document.createElement('option');
+            option.value = t._id;
+            option.textContent = t.name;
+            select.appendChild(option);
+        });
+    } catch (err) { console.error(err); }
 }
