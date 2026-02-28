@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FCMS - Dashboard</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+
+<body class="dashboard-body">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <i class="fas fa-futbol"></i> FCMS
+        </div>
+        <ul class="sidebar-menu">
+            <li><a href="#" class="active" data-target="dashboard-view"><i class="fas fa-home"></i> Dashboard</a></li>
+            <li><a href="#" data-target="players-view"><i class="fas fa-users"></i> Players</a></li>
+            <li><a href="#" data-target="tournaments-view"><i class="fas fa-trophy"></i> Tournaments</a></li>
+            <li><a href="#" data-target="fixtures-view"><i class="fas fa-calendar-alt"></i> Fixtures</a></li>
+            <li><a href="#" data-target="grounds-view"><i class="fas fa-map-marker-alt"></i> Grounds</a></li>
+        </ul>
+        <div class="sidebar-footer">
+            <button id="logoutBtn" class="btn-outline block"><i class="fas fa-sign-out-alt"></i> Logout</button>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <header class="topbar">
+            <h2 id="pageTitle">Admin Dashboard</h2>
+            <div class="user-info">
+                <span id="userName">Admin</span>
+                <i class="fas fa-user-circle"></i>
+            </div>
+        </header>
+
+        <!-- Dashboard Home View -->
+        <section id="dashboard-view" class="view active-view">
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <i class="fas fa-users stat-icon"></i>
+                    <div>
+                        <h3>Total Players</h3>
+                        <p id="statPlayers">0</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <i class="fas fa-trophy stat-icon"></i>
+                    <div>
+                        <h3>Tournaments</h3>
+                        <p id="statTournaments">0</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <i class="fas fa-calendar-alt stat-icon"></i>
+                    <div>
+                        <h3>Fixtures</h3>
+                        <p id="statFixtures">0</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="recent-activity">
+                <h3>Quick Actions</h3>
+                <div class="actions-grid">
+                    <button class="btn-secondary"
+                        onclick="document.querySelector('[data-target=\'players-view\']').click()"><i
+                            class="fas fa-users"></i> Manage Players</button>
+                    <button class="btn-secondary"
+                        onclick="document.querySelector('[data-target=\'tournaments-view\']').click()"><i
+                            class="fas fa-trophy"></i> Create Tournament</button>
+                    <button class="btn-secondary"
+                        onclick="document.querySelector('[data-target=\'fixtures-view\']').click()"><i
+                            class="fas fa-calendar-alt"></i> Generate Fixtures</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Players View -->
+        <section id="players-view" class="view hidden">
+            <div class="view-header">
+                <h3>Players</h3>
+                <button class="btn-primary admin-only" id="addPlayerBtn"><i class="fas fa-plus"></i> Add Player</button>
+            </div>
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Age</th>
+                        <th>Position</th>
+                        <th>Goals</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="playersTableBody">
+                    <!-- Data rendered via JS -->
+                </tbody>
+            </table>
+        </section>
+
+        <!-- Tournaments View -->
+        <section id="tournaments-view" class="view hidden">
+            <div class="view-header">
+                <h3>Tournaments</h3>
+                <button class="btn-primary admin-only" id="addTournamentBtn"><i class="fas fa-plus"></i> Add
+                    Tournament</button>
+            </div>
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Start Date</th>
+                        <th>End Date</th>
+                        <th>Entry Fee</th>
+                        <th>Prize Money</th>
+                    </tr>
+                </thead>
+                <tbody id="tournamentsTableBody">
+                    <!-- Data rendered via JS -->
+                </tbody>
+            </table>
+        </section>
+
+        <!-- Fixtures View -->
+        <section id="fixtures-view" class="view hidden">
+            <div class="view-header">
+                <h3>Fixtures</h3>
+            </div>
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Tournament</th>
+                        <th>Home Team</th>
+                        <th>Away Team</th>
+                        <th>Match Date</th>
+                        <th>Ground</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody id="fixturesTableBody">
+                    <!-- Data rendered via JS -->
+                </tbody>
+            </table>
+        </section>
+
+        <!-- Grounds View -->
+        <section id="grounds-view" class="view hidden">
+            <div class="view-header">
+                <h3>Grounds</h3>
+                <button class="btn-primary admin-only" id="addGroundBtn"><i class="fas fa-plus"></i> Add Ground</button>
+            </div>
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Location</th>
+                        <th>Capacity</th>
+                        <th>Rent/Match</th>
+                    </tr>
+                </thead>
+                <tbody id="groundsTableBody">
+                    <!-- Data rendered via JS -->
+                </tbody>
+            </table>
+        </section>
+
+    </main>
+
+    <!-- Modals for Add actions -->
+    <!-- Add Player Modal -->
+    <div id="addPlayerModal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" id="closePlayerModal">&times;</span>
+            <h3>Add New Player</h3>
+            <form id="addPlayerForm" class="dashboard-form">
+                <input type="text" id="playerName" placeholder="Player Name" required>
+                <input type="number" id="playerAge" placeholder="Age" required>
+                <select id="playerPosition" required>
+                    <option value="" disabled selected>Select Position</option>
+                    <option value="Forward">Forward</option>
+                    <option value="Midfielder">Midfielder</option>
+                    <option value="Defender">Defender</option>
+                    <option value="Goalkeeper">Goalkeeper</option>
+                </select>
+                <button type="submit" class="btn-primary">Save Player</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/dashboard.js"></script>
+</body>
+
+</html>
