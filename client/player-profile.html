@@ -474,9 +474,20 @@
             document.getElementById('statMatches').innerText = player.matchesPlayed || 0;
 
             if (player.image) {
-                document.getElementById('playerImage').src = player.image;
+                // If it's a relative path (starting with uploads/), prepend the API base URL
+                const imgSrc = player.image.startsWith('uploads/') || player.image.startsWith('assets/')
+                    ? player.image
+                    : player.image;
+
+                // For direct file uploads, we need to ensure they are point to the server
+                const finalSrc = player.image.startsWith('uploads/')
+                    ? `https://football-mf27.onrender.com/${player.image}`
+                    : player.image;
+
+                document.getElementById('playerImage').src = finalSrc;
             } else {
-                document.getElementById('playerImage').src = `https://source.unsplash.com/800x1000/?football,soccer,player&${encodeURIComponent(player.name)}`;
+                const query = `${player.name} football ${player.position}`;
+                document.getElementById('playerImage').src = `https://source.unsplash.com/featured/800x1000/?football,player,${encodeURIComponent(player.name)}`;
             }
         }
 

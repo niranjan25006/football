@@ -23,7 +23,13 @@ const getPlayerById = async (req, res) => {
 };
 
 const addPlayer = async (req, res) => {
-    const { name, age, position, number, height, preferredFoot, nationality, image, teamId } = req.body;
+    const { name, age, position, number, height, preferredFoot, nationality, teamId } = req.body;
+    let image = req.body.image;
+
+    if (req.file) {
+        image = `uploads/players/${req.file.filename}`;
+    }
+
     try {
         const player = new Player({ name, age, position, number, height, preferredFoot, nationality, image, teamId });
         const createdPlayer = await player.save();
@@ -44,11 +50,16 @@ const updatePlayer = async (req, res) => {
             player.height = req.body.height || player.height;
             player.preferredFoot = req.body.preferredFoot || player.preferredFoot;
             player.nationality = req.body.nationality || player.nationality;
-            player.image = req.body.image || player.image;
             player.teamId = req.body.teamId || player.teamId;
             player.goals = req.body.goals !== undefined ? req.body.goals : player.goals;
             player.assists = req.body.assists !== undefined ? req.body.assists : player.assists;
             player.matchesPlayed = req.body.matchesPlayed !== undefined ? req.body.matchesPlayed : player.matchesPlayed;
+
+            if (req.file) {
+                player.image = `uploads/players/${req.file.filename}`;
+            } else if (req.body.image) {
+                player.image = req.body.image;
+            }
 
             const updatedPlayer = await player.save();
             res.json(updatedPlayer);

@@ -113,7 +113,7 @@ async function fetchPlayers() {
             const tr = document.createElement('tr');
             tr.innerHTML = `
                 <td class="player-cell">
-                    <img src="${p.image || 'https://via.placeholder.com/40'}" class="player-thumb" alt="${p.name}">
+                    <img src="${p.image ? (p.image.startsWith('uploads/') ? 'https://football-mf27.onrender.com/' + p.image : p.image) : 'https://via.placeholder.com/40'}" class="player-thumb" alt="${p.name}">
                     <div>
                         <div class="player-name-main">${p.name}</div>
                         <small style="color:#8b949e">#${p.number || '--'}</small>
@@ -262,17 +262,27 @@ function setupModals() {
 
         modals.player.form.addEventListener('submit', async (e) => {
             e.preventDefault();
-            const payload = {
-                name: document.getElementById('playerName').value,
-                age: document.getElementById('playerAge').value,
-                position: document.getElementById('playerPosition').value,
-                number: document.getElementById('playerNumber').value,
-                nationality: document.getElementById('playerNationality').value,
-                height: document.getElementById('playerHeight').value,
-                preferredFoot: document.getElementById('playerFoot').value,
-                image: document.getElementById('playerImage').value
-            };
-            if (await submitForm('/players', payload)) {
+            const formData = new FormData();
+            formData.append('name', document.getElementById('playerName').value);
+            formData.append('age', document.getElementById('playerAge').value);
+            formData.append('position', document.getElementById('playerPosition').value);
+            formData.append('number', document.getElementById('playerNumber').value);
+            formData.append('nationality', document.getElementById('playerNationality').value);
+            formData.append('height', document.getElementById('playerHeight').value);
+            formData.append('preferredFoot', document.getElementById('playerFoot').value);
+
+            const imageFile = document.getElementById('playerImageFile').files[0];
+            const imageUrl = document.getElementById('playerImage').value;
+
+            if (imageFile) {
+                formData.append('image', imageFile);
+            } else if (imageUrl) {
+                formData.append('image', imageUrl);
+            } else {
+                formData.append('image', getAutoImage(document.getElementById('playerName').value));
+            }
+
+            if (await submitForm('/players', formData)) {
                 modals.player.el.classList.remove('show');
                 modals.player.form.reset();
                 fetchPlayers();
@@ -338,11 +348,15 @@ function setupModals() {
 }
 
 async function submitForm(endpoint, body) {
+    const isFormData = body instanceof FormData;
+    const headers = { 'Authorization': `Bearer ${token}` };
+    if (!isFormData) headers['Content-Type'] = 'application/json';
+
     try {
         const res = await fetch(`${API_URL}${endpoint}`, {
             method: 'POST',
-            headers: getHeaders(),
-            body: JSON.stringify(body)
+            headers: headers,
+            body: isFormData ? body : JSON.stringify(body)
         });
         if (res.ok) return true;
         const err = await res.json();
@@ -379,6 +393,12 @@ function getAutoImage(name) {
     if (n.includes('mbappe')) return 'assets/images/players/mbappe.png';
     if (n.includes('messi')) return 'assets/images/players/messi.png';
     if (n.includes('ronaldo')) return 'assets/images/players/ronaldo.png';
+    if (n.includes('haaland')) return 'https://images.unsplash.com/photo-1628891890467-b79f2c8ba9dc?auto=format&fit=crop&q=80&w=800';
+    if (n.includes('salah')) return 'https://images.unsplash.com/photo-1508098682722-e99c43a406b2?auto=format&fit=crop&q=80&w=800';
     if (n.includes('neymar')) return 'https://images.unsplash.com/photo-1540747913346-19e32dc3e97e?auto=format&fit=crop&q=80&w=800';
+    if (n.includes('bruyne')) return 'https://images.unsplash.com/photo-1517466787929-bc90951d0974?auto=format&fit=crop&q=80&w=800';
+    if (n.includes('dijk')) return 'https://images.unsplash.com/photo-1518005020250-68a0d0d75b17?auto=format&fit=crop&q=80&w=800';
+    if (n.includes('modric')) return 'https://images.unsplash.com/photo-1508098682722-e99c43a406b2?auto=format&fit=crop&q=80&w=800';
+    if (n.includes('neuer')) return 'https://images.unsplash.com/photo-1521731978332-9e9e714bdd20?auto=format&fit=crop&q=80&w=800';
     return '';
 }
