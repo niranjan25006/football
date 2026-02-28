@@ -23,9 +23,9 @@ const getPlayerById = async (req, res) => {
 };
 
 const addPlayer = async (req, res) => {
-    const { name, age, position, teamId } = req.body;
+    const { name, age, position, number, height, preferredFoot, nationality, image, teamId } = req.body;
     try {
-        const player = new Player({ name, age, position, teamId });
+        const player = new Player({ name, age, position, number, height, preferredFoot, nationality, image, teamId });
         const createdPlayer = await player.save();
         res.status(201).json(createdPlayer);
     } catch (error) {
@@ -40,10 +40,15 @@ const updatePlayer = async (req, res) => {
             player.name = req.body.name || player.name;
             player.age = req.body.age || player.age;
             player.position = req.body.position || player.position;
+            player.number = req.body.number !== undefined ? req.body.number : player.number;
+            player.height = req.body.height || player.height;
+            player.preferredFoot = req.body.preferredFoot || player.preferredFoot;
+            player.nationality = req.body.nationality || player.nationality;
+            player.image = req.body.image || player.image;
             player.teamId = req.body.teamId || player.teamId;
-            player.goals = req.body.goals || player.goals;
-            player.assists = req.body.assists || player.assists;
-            player.matchesPlayed = req.body.matchesPlayed || player.matchesPlayed;
+            player.goals = req.body.goals !== undefined ? req.body.goals : player.goals;
+            player.assists = req.body.assists !== undefined ? req.body.assists : player.assists;
+            player.matchesPlayed = req.body.matchesPlayed !== undefined ? req.body.matchesPlayed : player.matchesPlayed;
 
             const updatedPlayer = await player.save();
             res.json(updatedPlayer);

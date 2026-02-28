@@ -117,7 +117,8 @@ async function fetchPlayers() {
                 <td><span class="badge pos-${p.position?.toLowerCase()}">${p.position}</span></td>
                 <td>⚽ ${p.goals} &nbsp; <small style="color:#8b949e">A: ${p.assists}</small></td>
                 <td>
-                    ${user.role === 'admin' ? `<i class="fas fa-trash action-icon delete" title="Delete" onclick="deletePlayer('${p._id}')"></i>` : '–'}
+                    <i class="fas fa-user-circle action-icon view" title="View Profile" onclick="viewPlayerProfile('${p._id}')"></i>
+                    ${user.role === 'admin' ? `<i class="fas fa-trash action-icon delete" title="Delete" onclick="deletePlayer('${p._id}')"></i>` : ''}
                 </td>`;
             tbody.appendChild(tr);
         });
@@ -249,7 +250,12 @@ function setupModals() {
             const payload = {
                 name: document.getElementById('playerName').value,
                 age: document.getElementById('playerAge').value,
-                position: document.getElementById('playerPosition').value
+                position: document.getElementById('playerPosition').value,
+                number: document.getElementById('playerNumber').value,
+                nationality: document.getElementById('playerNationality').value,
+                height: document.getElementById('playerHeight').value,
+                preferredFoot: document.getElementById('playerFoot').value,
+                image: document.getElementById('playerImage').value
             };
             if (await submitForm('/players', payload)) {
                 modals.player.el.classList.remove('show');
@@ -347,4 +353,8 @@ async function populateTournamentSelect() {
             select.appendChild(option);
         });
     } catch (err) { console.error(err); }
+}
+
+function viewPlayerProfile(id) {
+    window.location.href = `player-profile.html?id=${id}`;
 }

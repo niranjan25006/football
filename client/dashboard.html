@@ -178,15 +178,31 @@
             <span class="close-btn" id="closePlayerModal">&times;</span>
             <h3 class="modal-title">Add New Player</h3>
             <form id="addPlayerForm" class="dashboard-form">
-                <input type="text" id="playerName" placeholder="Player Name" required>
-                <input type="number" id="playerAge" placeholder="Age" required>
-                <select id="playerPosition" required>
-                    <option value="" disabled selected>Select Position</option>
-                    <option value="Forward">Forward</option>
-                    <option value="Midfielder">Midfielder</option>
-                    <option value="Defender">Defender</option>
-                    <option value="Goalkeeper">Goalkeeper</option>
-                </select>
+                <input type="text" id="playerName" placeholder="Full Name (e.g. Kylian Mbappé)" required>
+                <div class="form-row">
+                    <input type="number" id="playerAge" placeholder="Age" required>
+                    <input type="number" id="playerNumber" placeholder="Jersey #" required>
+                </div>
+                <div class="form-row">
+                    <select id="playerPosition" required>
+                        <option value="" disabled selected>Position</option>
+                        <option value="Forward">Forward</option>
+                        <option value="Midfielder">Midfielder</option>
+                        <option value="Defender">Defender</option>
+                        <option value="Goalkeeper">Goalkeeper</option>
+                    </select>
+                    <input type="text" id="playerNationality" placeholder="Nationality (e.g. France)">
+                </div>
+                <div class="form-row">
+                    <input type="text" id="playerHeight" placeholder="Height (e.g. 1.78m)">
+                    <select id="playerFoot">
+                        <option value="" disabled selected>Preferred Foot</option>
+                        <option value="Right">Right</option>
+                        <option value="Left">Left</option>
+                        <option value="Both">Both</option>
+                    </select>
+                </div>
+                <input type="url" id="playerImage" placeholder="Image URL (Profile Picture)">
                 <button type="submit" class="btn-primary">Save Player</button>
             </form>
         </div>

@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Player Profile | Football Tracker</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Inter:wght@300;400;600&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        :root {
+            --accent-neon: #00ff88;
+            --bg-gradient: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%);
+            --header-gradient: linear-gradient(to bottom, rgba(0, 0, 0, 0) 0%, #0f172a 100%);
+        }
+
+        body {
+            background: var(--bg-gradient);
+            color: white;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .profile-container {
+            max-width: 500px;
+            margin: 0 auto;
+            position: relative;
+            padding-bottom: 50px;
+        }
+
+        .back-nav {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            z-index: 10;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: white;
+            text-decoration: none;
+        }
+
+        .player-header {
+            height: 450px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .player-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .header-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 250px;
+            background: var(--header-gradient);
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            padding: 30px;
+        }
+
+        .player-number {
+            font-size: 80px;
+            font-weight: 800;
+            line-height: 1;
+            opacity: 0.2;
+            position: absolute;
+            top: 40px;
+            right: 20px;
+            font-family: 'Outfit';
+        }
+
+        .player-name {
+            font-size: 32px;
+            font-weight: 800;
+            margin: 0;
+            text-transform: uppercase;
+            letter-spacing: -1px;
+        }
+
+        .player-meta {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-top: 10px;
+            color: var(--accent-neon);
+            font-weight: 600;
+        }
+
+        .flag-icon {
+            height: 20px;
+            border-radius: 3px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            padding: 0 20px;
+            margin-top: -30px;
+            position: relative;
+            z-index: 5;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 15px;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 18px;
+            font-weight: 700;
+            display: block;
+        }
+
+        .stat-label {
+            font-size: 11px;
+            color: #94a3b8;
+            text-transform: uppercase;
+            margin-top: 5px;
+            display: block;
+        }
+
+        .performance-section {
+            padding: 30px 20px;
+        }
+
+        .section-title {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 20px;
+        }
+
+        .perf-stat-card {
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 25px;
+            padding: 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            margin-bottom: 15px;
+        }
+
+        .perf-item {
+            text-align: center;
+        }
+
+        .perf-value {
+            font-size: 28px;
+            font-weight: 800;
+            display: block;
+            color: var(--accent-neon);
+        }
+
+        .perf-label {
+            font-size: 12px;
+            color: #94a3b8;
+            margin-top: 5px;
+        }
+
+        .action-button {
+            background: var(--accent-neon);
+            color: #0f172a;
+            width: calc(100% - 40px);
+            margin: 20px;
+            padding: 18px;
+            border-radius: 20px;
+            border: none;
+            font-weight: 800;
+            font-size: 16px;
+            cursor: pointer;
+            transition: transform 0.3s;
+            box-shadow: 0 10px 20px rgba(0, 255, 136, 0.2);
+        }
+
+        .action-button:active {
+            transform: scale(0.98);
+        }
+
+        /* Loading Animation */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: #0f172a;
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: opacity 0.5s;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="loading" class="loading-overlay">
+        <i class="fas fa-spinner fa-spin fa-2x" style="color: var(--accent-neon);"></i>
+    </div>
+
+    <div class="profile-container">
+        <a href="dashboard.html" class="back-nav">
+            <i class="fas fa-chevron-left"></i>
+        </a>
+
+        <div class="player-header">
+            <span id="playerNumber" class="player-number">--</span>
+            <img id="playerImage"
+                src="https://images.unsplash.com/photo-1574629810360-7efbbe195018?auto=format&fit=crop&q=80&w=800"
+                alt="Player" class="player-img">
+            <div class="header-overlay">
+                <h1 id="playerName" class="player-name">Loading...</h1>
+                <div class="player-meta">
+                    <span id="playerPosition">Position</span>
+                    <span style="opacity: 0.3">|</span>
+                    <span id="playerNationality">Nationality</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <span id="playerAge" class="stat-value">--</span>
+                <span class="stat-label">Age</span>
+            </div>
+            <div class="stat-card">
+                <span id="playerHeight" class="stat-value">--</span>
+                <span class="stat-label">Height</span>
+            </div>
+            <div class="stat-card">
+                <span id="playerFoot" class="stat-value">--</span>
+                <span class="stat-label">Foot</span>
+            </div>
+        </div>
+
+        <div class="performance-section">
+            <h3 class="section-title">Player Statistics</h3>
+            <div class="perf-stat-card">
+                <div class="perf-item">
+                    <span id="statGoals" class="perf-value">0</span>
+                    <span class="perf-label">Goals</span>
+                </div>
+                <div class="perf-item">
+                    <span id="statAssists" class="perf-value">0</span>
+                    <span class="perf-label">Assists</span>
+                </div>
+                <div class="perf-item">
+                    <span id="statMatches" class="perf-value">0</span>
+                    <span class="perf-label">Played</span>
+                </div>
+            </div>
+
+            <button class="action-button">TRACK PERFORMANCE</button>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = 'https://football-mf27.onrender.com/api';
+        const urlParams = new URLSearchParams(window.location.search);
+        const playerId = urlParams.get('id');
+        const token = localStorage.getItem('token');
+
+        if (!playerId || !token) {
+            window.location.href = 'dashboard.html';
+        }
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            try {
+                const res = await fetch(`${API_URL}/players/${playerId}`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const player = await res.json();
+
+                if (res.ok) {
+                    document.title = `${player.name} | Profile`;
+                    document.getElementById('playerName').innerText = player.name;
+                    document.getElementById('playerNumber').innerText = player.number || '00';
+                    document.getElementById('playerPosition').innerText = player.position;
+                    document.getElementById('playerNationality').innerText = player.nationality || 'Pro Player';
+                    document.getElementById('playerAge').innerText = player.age;
+                    document.getElementById('playerHeight').innerText = player.height || '1.80m';
+                    document.getElementById('playerFoot').innerText = player.preferredFoot || 'Right';
+                    document.getElementById('statGoals').innerText = player.goals || 0;
+                    document.getElementById('statAssists').innerText = player.assists || 0;
+                    document.getElementById('statMatches').innerText = player.matchesPlayed || 0;
+
+                    if (player.image) {
+                        document.getElementById('playerImage').src = player.image;
+                    }
+                }
+            } catch (err) {
+                console.error(err);
+            } finally {
+                document.getElementById('loading').style.opacity = '0';
+                setTimeout(() => document.getElementById('loading').style.display = 'none', 500);
+            }
+        });
+    </script>
+</body>
+
+</html>
