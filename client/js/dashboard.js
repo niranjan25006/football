@@ -242,9 +242,18 @@ function setupModals() {
         if (m.close) m.close.addEventListener('click', () => m.el.classList.remove('show'));
     });
 
-    // Specific Form Handlers
-    // Players
     if (modals.player.form) {
+        // Auto-suggest image based on name
+        const nameInput = document.getElementById('playerName');
+        const imageInput = document.getElementById('playerImage');
+
+        nameInput.addEventListener('blur', () => {
+            if (!imageInput.value) {
+                const autoImg = getAutoImage(nameInput.value);
+                if (autoImg) imageInput.value = autoImg;
+            }
+        });
+
         modals.player.form.addEventListener('submit', async (e) => {
             e.preventDefault();
             const payload = {
@@ -357,4 +366,13 @@ async function populateTournamentSelect() {
 
 function viewPlayerProfile(id) {
     window.location.href = `player-profile.html?id=${id}`;
+}
+
+function getAutoImage(name) {
+    const n = name.toLowerCase();
+    if (n.includes('mbappe')) return 'assets/images/players/mbappe.png';
+    if (n.includes('messi')) return 'assets/images/players/messi.png';
+    if (n.includes('ronaldo')) return 'assets/images/players/ronaldo.png';
+    if (n.includes('neymar')) return 'https://images.unsplash.com/photo-1540747913346-19e32dc3e97e?auto=format&fit=crop&q=80&w=800';
+    return '';
 }

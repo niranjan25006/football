@@ -308,6 +308,10 @@
 
                     if (player.image) {
                         document.getElementById('playerImage').src = player.image;
+                    } else {
+                        // Intelligent fallback based on name/position
+                        const query = `${player.name} football ${player.position}`;
+                        document.getElementById('playerImage').src = `https://source.unsplash.com/800x1000/?football,soccer,player&${encodeURIComponent(player.name)}`;
                     }
                 }
             } catch (err) {

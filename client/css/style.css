@@ -630,10 +630,15 @@ h6 {
     color: var(--text-muted);
     margin-right: 15px;
     cursor: pointer;
-    transition: color 0.3s;
+    transition: all 0.3s ease;
 }
 
 .action-icon:hover {
+    color: var(--primary-color);
+    transform: scale(1.15);
+}
+
+.action-icon.view {
     color: var(--primary-color);
 }
 
@@ -644,8 +649,33 @@ h6 {
 .dashboard-form {
     display: flex;
     flex-direction: column;
-    gap: 15px;
-    margin-top: 20px;
+    gap: 1.25rem;
+    margin-top: 1.5rem;
+}
+
+.form-row {
+    display: flex;
+    gap: 1.25rem;
+}
+
+.form-row input,
+.form-row select {
+    flex: 1;
+}
+
+.form-group {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.form-group label {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
 }
 
 /* Position Badges */
