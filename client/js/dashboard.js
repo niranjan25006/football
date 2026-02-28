@@ -124,7 +124,9 @@ async function fetchPlayers() {
                 <td>⚽ ${p.goals} &nbsp; <small style="color:#8b949e">A: ${p.assists}</small></td>
                 <td>
                     <i class="fas fa-user-circle action-icon view" title="View Profile" onclick="viewPlayerProfile('${p._id}')"></i>
-                    ${user.role === 'admin' ? `<i class="fas fa-trash action-icon delete" title="Delete" onclick="deletePlayer('${p._id}')"></i>` : ''}
+                    ${user.role === 'admin' ? `
+                        <i class="fas fa-edit action-icon edit" title="Edit Player" onclick="openEditPlayerModal('${p._id}')"></i>
+                        <i class="fas fa-trash action-icon delete" title="Delete" onclick="deletePlayer('${p._id}')"></i>` : ''}
                 </td>`;
             tbody.appendChild(tr);
         });
@@ -234,6 +236,7 @@ async function deletePlayer(id) {
 function setupModals() {
     const modals = {
         player: { el: document.getElementById('addPlayerModal'), open: document.getElementById('addPlayerBtn'), close: document.getElementById('closePlayerModal'), form: document.getElementById('addPlayerForm') },
+        editPlayer: { el: document.getElementById('editPlayerModal'), close: document.getElementById('closeEditPlayerModal'), form: document.getElementById('editPlayerForm') },
         tour: { el: document.getElementById('addTournamentModal'), open: document.getElementById('addTournamentBtn'), close: document.getElementById('closeTournamentModal'), form: document.getElementById('addTournamentForm') },
         fixture: { el: document.getElementById('addFixtureModal'), open: document.getElementById('generateFixturesBtn'), close: document.getElementById('closeFixtureModal'), form: document.getElementById('generateFixturesForm') },
         ground: { el: document.getElementById('addGroundModal'), open: document.getElementById('addGroundBtn'), close: document.getElementById('closeGroundModal'), form: document.getElementById('addGroundForm') }
@@ -287,6 +290,48 @@ function setupModals() {
                 modals.player.form.reset();
                 fetchPlayers();
                 loadDashboardData();
+            }
+        });
+    }
+
+    if (modals.editPlayer.form) {
+        modals.editPlayer.form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const id = document.getElementById('editPlayerId').value;
+            const formData = new FormData();
+            formData.append('name', document.getElementById('editPlayerName').value);
+            formData.append('age', document.getElementById('editPlayerAge').value);
+            formData.append('position', document.getElementById('editPlayerPosition').value);
+            formData.append('number', document.getElementById('editPlayerNumber').value);
+            formData.append('nationality', document.getElementById('editPlayerNationality').value);
+            formData.append('height', document.getElementById('editPlayerHeight').value);
+            formData.append('preferredFoot', document.getElementById('editPlayerFoot').value);
+
+            const fileInput = document.getElementById('editPlayerImageFile');
+            const urlInput = document.getElementById('editPlayerImage');
+
+            if (fileInput.files[0]) {
+                formData.append('image', fileInput.files[0]);
+            } else if (urlInput.value) {
+                formData.append('image', urlInput.value);
+            }
+
+            try {
+                const res = await fetch(`${API_URL}/players/${id}`, {
+                    method: 'PUT',
+                    headers: { 'Authorization': `Bearer ${token}` },
+                    body: formData
+                });
+                if (res.ok) {
+                    modals.editPlayer.el.classList.remove('show');
+                    fetchPlayers();
+                } else {
+                    const err = await res.json();
+                    alert(err.message || 'Update failed');
+                }
+            } catch (err) {
+                console.error(err);
+                alert('Server unreachable');
             }
         });
     }
@@ -386,6 +431,28 @@ async function populateTournamentSelect() {
 
 function viewPlayerProfile(id) {
     window.location.href = `player-profile.html?id=${id}`;
+}
+
+async function openEditPlayerModal(id) {
+    try {
+        const res = await fetch(`${API_URL}/players/${id}`, {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+        const p = await res.json();
+        if (res.ok) {
+            document.getElementById('editPlayerId').value = p._id;
+            document.getElementById('editPlayerName').value = p.name;
+            document.getElementById('editPlayerAge').value = p.age;
+            document.getElementById('editPlayerNumber').value = p.number || '';
+            document.getElementById('editPlayerPosition').value = p.position;
+            document.getElementById('editPlayerNationality').value = p.nationality || '';
+            document.getElementById('editPlayerHeight').value = p.height || '';
+            document.getElementById('editPlayerFoot').value = p.preferredFoot || '';
+            document.getElementById('editPlayerImage').value = p.image && !p.image.startsWith('uploads/') ? p.image : '';
+
+            document.getElementById('editPlayerModal').classList.add('show');
+        }
+    } catch (err) { console.error(err); }
 }
 
 function getAutoImage(name) {
