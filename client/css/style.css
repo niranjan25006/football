@@ -646,6 +646,25 @@ h6 {
     color: var(--danger);
 }
 
+.player-cell {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.player-thumb {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid var(--border-glass);
+}
+
+.player-name-main {
+    font-weight: 600;
+    color: #fff;
+}
+
 .dashboard-form {
     display: flex;
     flex-direction: column;

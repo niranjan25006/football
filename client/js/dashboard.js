@@ -112,7 +112,13 @@ async function fetchPlayers() {
         players.forEach(p => {
             const tr = document.createElement('tr');
             tr.innerHTML = `
-                <td>${p.name}</td>
+                <td class="player-cell">
+                    <img src="${p.image || 'https://via.placeholder.com/40'}" class="player-thumb" alt="${p.name}">
+                    <div>
+                        <div class="player-name-main">${p.name}</div>
+                        <small style="color:#8b949e">#${p.number || '--'}</small>
+                    </div>
+                </td>
                 <td>${p.age}</td>
                 <td><span class="badge pos-${p.position?.toLowerCase()}">${p.position}</span></td>
                 <td>⚽ ${p.goals} &nbsp; <small style="color:#8b949e">A: ${p.assists}</small></td>
