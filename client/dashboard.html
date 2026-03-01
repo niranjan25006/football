@@ -19,8 +19,10 @@
             <li><a href="#" class="active" data-target="dashboard-view"><i class="fas fa-home"></i> Dashboard</a></li>
             <li><a href="#" data-target="players-view"><i class="fas fa-users"></i> Players</a></li>
             <li><a href="#" data-target="tournaments-view"><i class="fas fa-trophy"></i> Tournaments</a></li>
-            <li><a href="#" data-target="fixtures-view"><i class="fas fa-calendar-alt"></i> Fixtures</a></li>
-            <li><a href="#" data-target="grounds-view"><i class="fas fa-map-marker-alt"></i> Grounds</a></li>
+            <li class="admin-only"><a href="#" data-target="fixtures-view"><i class="fas fa-calendar-alt"></i>
+                    Fixtures</a></li>
+            <li class="admin-only"><a href="#" data-target="grounds-view"><i class="fas fa-map-marker-alt"></i>
+                    Grounds</a></li>
         </ul>
         <div class="sidebar-footer">
             <button id="logoutBtn" class="btn-outline block"><i class="fas fa-sign-out-alt"></i> Logout</button>
@@ -116,6 +118,8 @@
                         <th>End Date</th>
                         <th>Entry Fee</th>
                         <th>Prize Money</th>
+                        <th>Teams</th>
+                        <th>Action</th>
                     </tr>
                 </thead>
                 <tbody id="tournamentsTableBody">

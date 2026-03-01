@@ -204,7 +204,17 @@ async function fetchTournaments() {
                 <td>${startDate}</td>
                 <td>${endDate}</td>
                 <td style="color:#00ff88;">₹${Number(t.entryFee).toLocaleString('en-IN')}</td>
-                <td style="color:#ffd700;">₹${Number(t.prizeMoney).toLocaleString('en-IN')}</td>`;
+                <td style="color:#ffd700;">₹${Number(t.prizeMoney).toLocaleString('en-IN')}</td>
+                <td style="text-align:center"><span class="badge" style="background:rgba(255,255,255,0.05);color:#fff">${t.registrationCount || 0}</span></td>
+                <td>
+                    ${user.role === 'admin' ?
+                    `<i class="fas fa-edit action-icon" title="Edit"></i>` :
+                    (t.userStatus ?
+                        `<span class="badge ${t.userStatus === 'approved' ? 'pos-forward' : 'pos-midfielder'}" style="font-size:10px">${t.userStatus.toUpperCase()}</span>` :
+                        `<button class="btn-primary" style="padding: 5px 12px; font-size: 12px;" onclick="applyToTournament('${t._id}')">Apply</button>`
+                    )
+                }
+                </td>`;
             tbody.appendChild(tr);
         });
     } catch (err) {
@@ -474,6 +484,22 @@ async function populateTournamentSelect() {
             select.appendChild(option);
         });
     } catch (err) { console.error(err); }
+}
+
+async function applyToTournament(id) {
+    try {
+        const res = await apiFetch(`/tournaments/${id}/apply`, { method: 'POST' });
+        const data = await res.json();
+        if (res.ok) {
+            alert('Success! Your application has been submitted.');
+            fetchTournaments();
+        } else {
+            alert(data.message || 'Application failed');
+        }
+    } catch (err) {
+        console.error(err);
+        alert('Server unreachable');
+    }
 }
 
 function viewPlayerProfile(id) {

@@ -113,11 +113,8 @@ document.addEventListener('DOMContentLoaded', () => {
         e.preventDefault();
         const email = document.getElementById('loginEmail').value;
         const password = document.getElementById('loginPassword').value;
-        const isAdmin = document.getElementById('loginIsAdmin').checked;
         const submitBtn = loginForm.querySelector('button[type="submit"]');
         const originalBtnText = submitBtn.innerText;
-
-        const endpoint = isAdmin ? '/auth/admin/login' : '/auth/login';
 
         // Show loading state
         submitBtn.disabled = true;
@@ -125,16 +122,26 @@ document.addEventListener('DOMContentLoaded', () => {
         loginError.innerText = '';
 
         try {
-            const res = await apiFetch(endpoint, {
+            const res = await apiFetch('/auth/login', {
                 method: 'POST',
                 body: JSON.stringify({ email, password })
             });
             const data = await res.json();
 
             if (res.ok) {
+                // Trigger Lightning Flash for "Attractive" effect
+                const lightning = document.querySelector('.lightning-container');
+                if (lightning) {
+                    lightning.style.animation = 'lightningFlash 0.5s ease-out forwards';
+                }
+
                 localStorage.setItem('token', data.token);
                 localStorage.setItem('user', JSON.stringify(data));
-                window.location.href = 'dashboard.html';
+
+                // Short delay to show animation before redirect
+                setTimeout(() => {
+                    window.location.href = 'dashboard.html';
+                }, 600);
             } else {
                 loginError.innerText = data.message || 'Login failed';
                 submitBtn.disabled = false;
@@ -153,11 +160,8 @@ document.addEventListener('DOMContentLoaded', () => {
         const username = document.getElementById('regUsername').value;
         const email = document.getElementById('regEmail').value;
         const password = document.getElementById('regPassword').value;
-        const isAdmin = document.getElementById('regIsAdmin').checked;
         const submitBtn = registerForm.querySelector('button[type="submit"]');
         const originalBtnText = submitBtn.innerText;
-
-        const endpoint = isAdmin ? '/auth/admin/register' : '/auth/register';
 
         // Show loading state
         submitBtn.disabled = true;
@@ -165,7 +169,7 @@ document.addEventListener('DOMContentLoaded', () => {
         regError.innerText = '';
 
         try {
-            const res = await apiFetch(endpoint, {
+            const res = await apiFetch('/auth/register', {
                 method: 'POST',
                 body: JSON.stringify({ username, email, password })
             });
