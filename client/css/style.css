@@ -14,10 +14,12 @@
     --surface-card: rgba(22, 27, 34, 0.7);
     --surface-glass: rgba(30, 41, 59, 0.4);
 
-    /* Text colors */
-    --text-primary: #f8fafc;
-    --text-secondary: #94a3b8;
-    --text-muted: #64748b;
+    /* Text colors - increased contrast for visibility */
+    --text-primary: #ffffff;
+    --text-secondary: #cbd5e1;
+    /* Clearer light grey */
+    --text-muted: #94a3b8;
+    /* Was previously secondary, now muted is more readable */
 
     /* Functional colors */
     --success: #22c55e;
@@ -365,8 +367,10 @@ h6 {
 .form-group label {
     display: block;
     margin-bottom: 8px;
-    color: var(--text-muted);
+    color: var(--text-secondary);
+    /* Using secondary instead of muted for higher contrast */
     font-size: 0.9rem;
+    font-weight: 500;
 }
 
 .form-group input,
@@ -703,10 +707,34 @@ h6 {
 
 .form-group label {
     font-size: 0.75rem;
-    color: var(--text-muted);
+    color: var(--text-secondary);
+    /* Higher contrast */
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.5px;
+}
+
+.form-note {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    margin: 10px 0;
+}
+
+.file-label {
+    font-size: 12px;
+    color: var(--text-secondary);
+    margin-bottom: 5px;
+    display: block;
+    font-weight: 600;
+}
+
+.custom-file-input {
+    padding: 10px;
+    background: rgba(255, 255, 255, 0.05);
+    color: var(--text-primary);
+    border: 1px solid var(--border-glass);
+    border-radius: 8px;
+    width: 100%;
 }
 
 /* Position Badges */
