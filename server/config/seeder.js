@@ -7,15 +7,9 @@ const bcrypt = require('bcrypt');
 
 const seedIfEmpty = async () => {
     try {
-        const playerCount = await Player.countDocuments();
-        if (playerCount > 0) {
-            console.log('📊 Database already has players, skipping auto-seed.');
-            return;
-        }
+        console.log('🌱 Starting seeder checks...');
 
-        console.log('🌱 Database is empty. Starting professional auto-seed...');
-
-        // 1. Create Default Admin
+        // 1. Create Default Admin if it doesn't exist (Always check this)
         const adminEmail = 'admin@fcms.com';
         let admin = await User.findOne({ email: adminEmail });
         if (!admin) {
@@ -27,8 +21,18 @@ const seedIfEmpty = async () => {
                 password: hashedPassword,
                 role: 'admin'
             });
-            console.log('   ✅ Default Admin created (admin@fcms.com / admin1234)');
+            console.log('   ✅ Default Admin created/verified (admin@fcms.com / admin1234)');
+        } else {
+            console.log('   ℹ️ Admin already exists.');
         }
+
+        const playerCount = await Player.countDocuments();
+        if (playerCount > 0) {
+            console.log('   📊 Database already has players, skipping pro-data seed.');
+            return;
+        }
+
+        console.log('   🚀 Player data is empty. Starting professional auto-seed...');
 
         // 2. Create Pro Grounds
         const grounds = await Ground.create([
