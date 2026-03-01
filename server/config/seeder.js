@@ -3,6 +3,7 @@ const Player = require('../models/Player');
 const Team = require('../models/Team');
 const Tournament = require('../models/Tournament');
 const Ground = require('../models/Ground');
+const Fixture = require('../models/Fixture');
 const bcrypt = require('bcrypt');
 
 const seedIfEmpty = async () => {
@@ -242,17 +243,40 @@ const seedIfEmpty = async () => {
         ]);
         console.log('   ✅ Expanded Pro Players added with high-quality photos');
 
-        // 5. Create a Sample Tournament
-        await Tournament.create({
+        // 5. Create a Sample Tournament with Registered Teams
+        const tournament = await Tournament.create({
             name: 'Ultimate Champions Cup 2026',
-            startDate: '2026-03-01',
-            endDate: '2026-05-30',
+            startDate: new Date(),
+            endDate: new Date(Date.now() + 90 * 24 * 60 * 60 * 1000), // 90 days from now
             entryFee: 15000,
-            prizeMoney: 1000000
+            prizeMoney: 1000000,
+            teamsRegistered: teams.map(t => t._id) // Register all seeded teams
         });
-        console.log('   ✅ Sample Tournament created');
+        console.log('   ✅ Sample Tournament created with registered teams');
 
-        console.log('🚀 AUTO-SEED COMPLETE! FCMS is now ready with professional data.');
+        // 6. Create Initial Fixtures
+        const initialFixtures = [
+            {
+                tournamentId: tournament._id,
+                homeTeam: teams[0]._id, // Real Madrid
+                awayTeam: teams[1]._id, // Man City
+                matchDate: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000), // In 2 days
+                groundId: grounds[0]._id, // Bernabeu
+                status: 'scheduled'
+            },
+            {
+                tournamentId: tournament._id,
+                homeTeam: teams[6]._id, // Barca
+                awayTeam: teams[5]._id, // Liverpool
+                matchDate: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000), // In 3 days
+                groundId: grounds[1]._id, // Camp Nou
+                status: 'scheduled'
+            }
+        ];
+        await Fixture.insertMany(initialFixtures);
+        console.log('   ✅ Initial Fixtures generated');
+
+        console.log('🚀 AUTO-SEED COMPLETE! FCMS is now ready with professional data and scheduled matches.');
     } catch (error) {
         console.error('❌ Auto-seed failed:', error.message);
     }
