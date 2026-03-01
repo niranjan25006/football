@@ -1,5 +1,4 @@
 const User = require('../models/User');
-const Admin = require('../models/Admin');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 
@@ -62,48 +61,26 @@ const loginUser = async (req, res) => {
 };
 
 const registerAdmin = async (req, res) => {
-    const { username, email, password } = req.body;
-    try {
-        const adminExists = await Admin.findOne({ email });
-        if (adminExists) return res.status(400).json({ message: 'Admin already exists' });
-
-        const salt = await bcrypt.genSalt(10);
-        const hashedPassword = await bcrypt.hash(password, salt);
-
-        const admin = await Admin.create({
-            username,
-            email,
-            password: hashedPassword
-        });
-
-        if (admin) {
-            res.status(201).json({
-                _id: admin.id,
-                username: admin.username,
-                email: admin.email,
-                role: 'admin',
-                token: generateToken(admin._id, 'admin'),
-            });
-        } else {
-            res.status(400).json({ message: 'Invalid admin data' });
-        }
-    } catch (error) {
-        res.status(500).json({ message: error.message });
-    }
+    req.body.role = 'admin';
+    return registerUser(req, res);
 };
 
 const loginAdmin = async (req, res) => {
+    // We allow admin-specific login checks here if needed, 
+    // but for now, they use the same account pool
     const { email, password } = req.body;
     try {
-        const admin = await Admin.findOne({ email });
-        if (admin && (await bcrypt.compare(password, admin.password))) {
+        const user = await User.findOne({ email });
+        if (user && user.role === 'admin' && (await bcrypt.compare(password, user.password))) {
             res.json({
-                _id: admin.id,
-                username: admin.username,
-                email: admin.email,
+                _id: user.id,
+                username: user.username,
+                email: user.email,
                 role: 'admin',
-                token: generateToken(admin._id, 'admin'),
+                token: generateToken(user._id, 'admin'),
             });
+        } else if (user && user.role !== 'admin') {
+            res.status(403).json({ message: 'Access denied. Use normal login.' });
         } else {
             res.status(401).json({ message: 'Invalid email or password' });
         }

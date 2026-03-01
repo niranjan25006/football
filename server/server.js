@@ -4,12 +4,15 @@ const cors = require('cors');
 const compression = require('compression');
 const morgan = require('morgan');
 const connectDB = require('./config/db');
+const { seedIfEmpty } = require('./config/seeder');
 
 // Load env vars
 dotenv.config();
 
-// Connect to database
-connectDB();
+// Connect to database and seed
+connectDB().then(() => {
+    seedIfEmpty();
+});
 
 const app = express();
 

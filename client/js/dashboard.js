@@ -1,9 +1,19 @@
-const isLocal = window.location.hostname === 'localhost' ||
-    window.location.hostname === '127.0.0.1' ||
-    window.location.hostname === '' ||
-    window.location.protocol === 'file:';
-const API_BASE = isLocal ? 'http://localhost:5000' : 'https://football-mf27.onrender.com';
-const API_URL = `${API_BASE}/api`;
+const getApiUrl = () => {
+    const hostname = window.location.hostname;
+    const isLocal =
+        hostname === 'localhost' ||
+        hostname === '127.0.0.1' ||
+        hostname === '' ||
+        hostname.startsWith('192.168.') ||
+        hostname.startsWith('10.') ||
+        hostname.startsWith('172.') ||
+        window.location.protocol === 'file:';
+
+    return isLocal ? 'http://localhost:5000/api' : 'https://football-mf27.onrender.com/api';
+};
+
+const API_URL = getApiUrl();
+const API_BASE = API_URL.replace('/api', '');
 
 console.log('🚀 FCMS Dashboard Started. API Path:', API_URL);
 let token = localStorage.getItem('token');
@@ -87,7 +97,7 @@ async function apiFetch(endpoint, options = {}) {
         return response;
     } catch (error) {
         console.error('Fetch error:', error);
-        throw error;
+        throw new Error('Network error. Please ensure the backend server is running on port 5000.');
     }
 }
 
