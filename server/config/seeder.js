@@ -64,9 +64,11 @@ const seedIfEmpty = async () => {
             { name: 'FC Bayern Munich', founded: 1900 },
             { name: 'Tottenham Hotspur', founded: 1882 },
             { name: 'Atletico Madrid', founded: 1903 },
-            { name: 'Inter Milan', founded: 1908 }
+            { name: 'Inter Milan', founded: 1908 },
+            { name: 'Manchester United', founded: 1878 },
+            { name: 'AC Milan', founded: 1899 }
         ]);
-        console.log('   ✅ Pro Teams expanded (added Spurs, Atletico, Inter)');
+        console.log('   ✅ Pro Teams expanded (added Man Utd, AC Milan)');
 
         // 4. Create Pro Players
         await Player.create([
@@ -121,24 +123,64 @@ const seedIfEmpty = async () => {
                 goals: 25, assists: 5
             },
             {
-                name: 'Son Heung-min',
-                age: 31,
-                position: 'Forward',
-                number: 7,
-                nationality: 'South Korea',
-                teamId: teams[9]._id,
-                image: 'https://images.unsplash.com/photo-1540747913346-19e32dc3e97e?auto=format&fit=crop&q=80&w=800',
-                goals: 12, assists: 6
+                name: 'Bruno Fernandes',
+                age: 29,
+                position: 'Midfielder',
+                number: 8,
+                nationality: 'Portugal',
+                teamId: teams[12]._id,
+                image: 'https://images.unsplash.com/photo-1517466787929-bc90951d0974?auto=format&fit=crop&q=80&w=800',
+                goals: 10, assists: 11
             },
             {
-                name: 'Antoine Griezmann',
-                age: 33,
+                name: 'Marcus Rashford',
+                age: 26,
                 position: 'Forward',
-                number: 7,
-                nationality: 'France',
-                teamId: teams[10]._id,
+                number: 10,
+                nationality: 'England',
+                teamId: teams[12]._id,
+                image: 'https://images.unsplash.com/photo-1540747913346-19e32dc3e97e?auto=format&fit=crop&q=80&w=800',
+                goals: 12, assists: 4
+            },
+            {
+                name: 'Rafael Leão',
+                age: 24,
+                position: 'Forward',
+                number: 10,
+                nationality: 'Portugal',
+                teamId: teams[13]._id,
                 image: 'https://images.unsplash.com/photo-1508098682722-e99c43a406b2?auto=format&fit=crop&q=80&w=800',
-                goals: 11, assists: 7
+                goals: 9, assists: 8
+            },
+            {
+                name: 'Martin Ødegaard',
+                age: 25,
+                position: 'Midfielder',
+                number: 8,
+                nationality: 'Norway',
+                teamId: teams[7]._id,
+                image: 'https://images.unsplash.com/photo-1517466787929-bc90951d0974?auto=format&fit=crop&q=80&w=800',
+                goals: 8, assists: 10
+            },
+            {
+                name: 'Leroy Sané',
+                age: 28,
+                position: 'Forward',
+                number: 10,
+                nationality: 'Germany',
+                teamId: teams[8]._id,
+                image: 'https://images.unsplash.com/photo-1508098682722-e99c43a406b2?auto=format&fit=crop&q=80&w=800',
+                goals: 11, assists: 13
+            },
+            {
+                name: 'Alphonso Davies',
+                age: 23,
+                position: 'Defender',
+                number: 19,
+                nationality: 'Canada',
+                teamId: teams[8]._id,
+                image: 'https://images.unsplash.com/photo-1518005020250-68a0d0d75b17?auto=format&fit=crop&q=80&w=800',
+                goals: 2, assists: 6
             },
             {
                 name: 'Vinícius Júnior',
@@ -151,14 +193,14 @@ const seedIfEmpty = async () => {
                 goals: 10, assists: 8
             },
             {
-                name: 'Mohamed Salah',
-                age: 31,
-                position: 'Forward',
-                number: 11,
-                nationality: 'Egypt',
-                teamId: teams[5]._id,
-                image: 'https://images.unsplash.com/photo-1508098682722-e99c43a406b2?auto=format&fit=crop&q=80&w=800',
-                goals: 15, assists: 8
+                name: 'Gavi',
+                age: 19,
+                position: 'Midfielder',
+                number: 6,
+                nationality: 'Spain',
+                teamId: teams[6]._id,
+                image: 'https://images.unsplash.com/photo-1517466787929-bc90951d0974?auto=format&fit=crop&q=80&w=800',
+                goals: 3, assists: 5
             },
             {
                 name: 'Robert Lewandowski',
@@ -171,26 +213,6 @@ const seedIfEmpty = async () => {
                 goals: 11, assists: 5
             },
             {
-                name: 'Lautaro Martínez',
-                age: 26,
-                position: 'Forward',
-                number: 10,
-                nationality: 'Argentina',
-                teamId: teams[11]._id,
-                image: 'https://images.unsplash.com/photo-1540747913346-19e32dc3e97e?auto=format&fit=crop&q=80&w=800',
-                goals: 16, assists: 4
-            },
-            {
-                name: 'Pedri',
-                age: 21,
-                position: 'Midfielder',
-                number: 8,
-                nationality: 'Spain',
-                teamId: teams[6]._id,
-                image: 'https://images.unsplash.com/photo-1517466787929-bc90951d0974?auto=format&fit=crop&q=80&w=800',
-                goals: 3, assists: 8
-            },
-            {
                 name: 'Jude Bellingham',
                 age: 20,
                 position: 'Midfielder',
@@ -199,16 +221,6 @@ const seedIfEmpty = async () => {
                 teamId: teams[0]._id,
                 image: 'https://images.unsplash.com/photo-1522778119026-d647f0596c20?auto=format&fit=crop&q=80&w=800',
                 goals: 10, assists: 6
-            },
-            {
-                name: 'Bukayo Saka',
-                age: 22,
-                position: 'Forward',
-                number: 7,
-                nationality: 'England',
-                teamId: teams[7]._id,
-                image: 'https://images.unsplash.com/photo-1508098682722-e99c43a406b2?auto=format&fit=crop&q=80&w=800',
-                goals: 13, assists: 9
             },
             {
                 name: 'Virgil van Dijk',
