@@ -378,7 +378,8 @@ h6 {
 .dashboard-form select {
     width: 100%;
     padding: 14px;
-    background: rgba(255, 255, 255, 0.03);
+    background: rgba(255, 255, 255, 0.05);
+    /* Slightly lighter for depth */
     border: 1px solid var(--border-glass);
     color: var(--text-primary);
     border-radius: var(--radius-sm);
@@ -386,8 +387,26 @@ h6 {
     transition: all 0.3s ease;
 }
 
+/* Fix for invisible placeholders on dark theme */
+.form-group input::placeholder,
+.dashboard-form input::placeholder {
+    color: var(--text-secondary);
+    /* High contrast grey */
+    opacity: 0.8;
+}
+
+/* Fix for invisible dropdown options (select elements) */
+.dashboard-form select option {
+    background-color: var(--surface-dark);
+    /* Ensure dark background in dropdown */
+    color: var(--text-primary);
+    /* Ensure light text */
+    padding: 10px;
+}
+
 .form-group input:focus,
-.dashboard-form input:focus {
+.dashboard-form input:focus,
+.dashboard-form select:focus {
     outline: none;
     border-color: var(--primary-color);
     background: rgba(0, 255, 136, 0.05);
