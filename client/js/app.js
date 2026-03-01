@@ -9,7 +9,7 @@ const getApiUrl = () => {
         hostname.startsWith('172.') ||
         window.location.protocol === 'file:';
 
-    return isLocal ? 'http://localhost:5000/api' : 'https://football-mf27.onrender.com/api';
+    return isLocal ? 'http://127.0.0.1:5000/api' : 'https://football-mf27.onrender.com/api';
 };
 
 const API_URL = getApiUrl();
@@ -45,10 +45,16 @@ async function apiFetch(endpoint, options = {}) {
             }
         }
 
+        if (!response.ok) {
+            const errBody = await response.clone().text();
+            console.error('Fetch error response:', errBody);
+            throw new Error(`Server error (${response.status}).`);
+        }
+
         return response;
     } catch (error) {
         console.error('Fetch error:', error);
-        throw new Error('Network error. Please ensure the backend server is running on port 5000.');
+        throw error;
     }
 }
 
